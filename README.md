@@ -1,6 +1,6 @@
 # Dimbuntu Tiny
 
-**Dimbuntu Tiny** — крошечный «свой» live-дистрибутив на базе **Tiny Core Linux (CorePlus)**. Итоговый ISO весит **~110 МБ** — в ~14 раз меньше прежней Ubuntu-сборки, грузится за секунды.
+**Dimbuntu Tiny** — маленький «свой» live-дистрибутив на базе **Tiny Core Linux (CorePlus)**. Итоговый ISO весит **~250 МБ** — в ~6 раз меньше прежней Ubuntu-сборки (1.5 ГБ), грузится за секунды.
 
 ![Build](https://github.com/ehekufa/Dimbuntu/actions/workflows/build-iso.yml/badge.svg)
 
@@ -47,5 +47,6 @@ Workflow не содержит зашитого имени репозитори�
 
 - Вшить свои расширения (.tcz) прямо в initrd
 - Своя тема wbar, обои, брендинг
+- Ещё более мелкий вариант на чистом **TinyCore** (~26 МБ, но без русской консольной раскладки и Wi-Fi из коробки)
 - CorePure64 (x86_64 + UEFI) вариант
 - Persist-режим для флешки (tce/copy2fs)

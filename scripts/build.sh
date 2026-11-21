@@ -53,7 +53,7 @@ download_coreplus() {
 log "Downloading CorePlus (Tiny Core Linux base)"
 TC_V=""
 download_coreplus || die "Could not download any CorePlus ISO. Tried versions: $TC_VERSIONS"
-ISO_FILE="$BUILD_DIR/CorePlus-$TC_V.iso"
+ISO_FILE="$DL_DIR/CorePlus-$TC_V.iso"
 log "CorePlus-$TC_V downloaded: $(du -h "$ISO_FILE" | cut -f1)"
 
 # ---------------------------------------------------------------- 2. Extract

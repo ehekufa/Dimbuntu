@@ -61,15 +61,22 @@ jobs:
         run: |
           cd build
           rm -f SHA256SUMS
-          sha256sum *.iso > SHA256SUMS
+          sha256sum dimbuntu-*.iso > SHA256SUMS
           ls -lh
+          {
+            echo "### Artifacts"
+            echo '```text'
+            ls -lh
+            cat SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
         with:
           name: dimbuntu-tiny-x86
           path: |
-            build/*.iso
+            build/dimbuntu-*.iso
             build/SHA256SUMS
           compression-level: 0
           if-no-files-found: error

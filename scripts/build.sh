@@ -15,6 +15,7 @@ STAGING="$BUILD_DIR/iso-src"
 ISO_OUT="$BUILD_DIR/${ISO_NAME}.iso"
 
 MIRRORS=( http://tinycorelinux.net http://repo.tinycorelinux.net http://distro.ibiblio.org/tinycorelinux )
+DL_DIR="$BUILD_DIR/download"
 
 log() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 die() { printf '\n\033[1;31mFATAL: %s\033[0m\n' "$*" >&2; exit 1; }
@@ -25,7 +26,7 @@ for tool in curl bsdtar xorriso sha256sum md5sum; do
 done
 
 rm -rf "$STAGING"
-mkdir -p "$BUILD_DIR" "$STAGING"
+mkdir -p "$BUILD_DIR" "$STAGING" "$DL_DIR"
 
 # ---------------------------------------------------------------- 1. Download
 download_coreplus() {
@@ -35,15 +36,15 @@ download_coreplus() {
       base="$M/$major.x/x86/release"
       log "Trying $base/CorePlus-$V.iso"
       if curl -fSL --retry 2 --connect-timeout 15 --max-time 900 \
-           -o "$BUILD_DIR/CorePlus-$V.iso" "$base/CorePlus-$V.iso" \
+           -o "$DL_DIR/CorePlus-$V.iso" "$base/CorePlus-$V.iso" \
         && curl -fsSL --retry 2 --connect-timeout 15 --max-time 60 \
-           -o "$BUILD_DIR/CorePlus-$V.iso.md5.txt" "$base/CorePlus-$V.iso.md5.txt" \
-        && ( cd "$BUILD_DIR" && md5sum -c "CorePlus-$V.iso.md5.txt" ); then
+           -o "$DL_DIR/CorePlus-$V.iso.md5.txt" "$base/CorePlus-$V.iso.md5.txt" \
+        && ( cd "$DL_DIR" && md5sum -c "CorePlus-$V.iso.md5.txt" ); then
         TC_V="$V"
         return 0
       fi
       log "Download/verify failed for $base -- trying next mirror"
-      rm -f "$BUILD_DIR/CorePlus-$V.iso" "$BUILD_DIR/CorePlus-$V.iso.md5.txt"
+      rm -f "$DL_DIR/CorePlus-$V.iso" "$DL_DIR/CorePlus-$V.iso.md5.txt"
     done
   done
   return 1

@@ -1,0 +1,4 @@
+build/
+*.iso
+*.squashfs
+SHA256SUMS

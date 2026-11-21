@@ -1,0 +1,68 @@
+name: Build Dimbuntu ISO
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-iso-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build live ISO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -af || true
+          df -h /
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            debootstrap squashfs-tools xorriso \
+            grub-pc-bin grub-efi-amd64-bin \
+            mtools
+
+      - name: Build Dimbuntu live ISO
+        run: sudo ./scripts/build.sh
+
+      - name: Checksums and info
+        run: |
+          cd build
+          sha256sum *.iso > SHA256SUMS
+          ls -lh
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dimbuntu-24.04-amd64
+          path: |
+            build/dimbuntu-*.iso
+            build/SHA256SUMS
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach ISO to GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "Dimbuntu $GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" build/dimbuntu-*.iso build/SHA256SUMS

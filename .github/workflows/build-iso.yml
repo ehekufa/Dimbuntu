@@ -68,6 +68,7 @@ jobs:
       - name: Checksums and info
         run: |
           cd build
+          rm -f SHA256SUMS
           sha256sum *.iso > SHA256SUMS
           ls -lh
 

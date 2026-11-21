@@ -7,6 +7,7 @@ on:
       - 'arena/**'
     paths-ignore:
       - '**.md'
+      - 'build_log.txt'
   workflow_dispatch:
 
 permissions:
@@ -40,7 +41,9 @@ jobs:
             mtools
 
       - name: Build Dimbuntu live ISO
-        run: sudo bash -x ./scripts/build.sh > build_log.txt 2>&1
+        run: |
+          mkdir -p build
+          sudo bash -x ./scripts/build.sh > build_log.txt 2>&1
 
       - name: Publish build log tail
         if: always()
@@ -52,6 +55,15 @@ jobs:
             tail -n 300 build_log.txt || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit build log into the repo on failure
+        if: failure()
+        run: |
+          git config user.name "dimbuntu-ci"
+          git config user.email "actions@users.noreply.github.com"
+          git add build_log.txt
+          git commit -m "CI: build log from run ${GITHUB_RUN_ID}" || echo "nothing to commit"
+          git push origin HEAD:"$GITHUB_REF_NAME"
 
       - name: Checksums and info
         run: |

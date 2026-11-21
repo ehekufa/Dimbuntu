@@ -1,0 +1,91 @@
+name: Build Dimbuntu Tiny ISO
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths-ignore:
+      - '**.md'
+      - 'build_log.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-iso-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Tiny Core ISO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xorriso libarchive-tools syslinux-common curl
+
+      - name: Build Dimbuntu Tiny ISO
+        run: |
+          mkdir -p build
+          bash -x ./scripts/build.sh > build_log.txt 2>&1
+
+      - name: Publish build log tail
+        if: always()
+        run: |
+          tail -n 200 build_log.txt || true
+          {
+            echo "### Dimbuntu Tiny build log — last 200 lines"
+            echo '```text'
+            tail -n 200 build_log.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit build log into the repo on failure
+        if: failure()
+        run: |
+          git config user.name "dimbuntu-ci"
+          git config user.email "actions@users.noreply.github.com"
+          git add -f build_log.txt || true
+          git commit -m "CI: build log from run ${GITHUB_RUN_ID}" || echo "nothing to commit"
+          git push origin HEAD:"$GITHUB_REF_NAME"
+
+      - name: Checksums and info
+        run: |
+          cd build
+          rm -f SHA256SUMS
+          sha256sum dimbuntu-*.iso > SHA256SUMS
+          ls -lh
+          {
+            echo "### Artifacts"
+            echo '```text'
+            ls -lh
+            cat SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dimbuntu-tiny-x86
+          path: |
+            build/dimbuntu-*.iso
+            build/SHA256SUMS
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach ISO to GitHub Release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "Dimbuntu Tiny $GITHUB_REF_NAME" --generate-notes
+          gh release upload "$GITHUB_REF_NAME" build/*.iso build/SHA256SUMS

@@ -1,0 +1,5 @@
+build/
+*.iso
+*.squashfs
+SHA256SUMS
+build_log.txt

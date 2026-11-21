@@ -40,7 +40,18 @@ jobs:
             mtools
 
       - name: Build Dimbuntu live ISO
-        run: sudo ./scripts/build.sh
+        run: sudo bash -x ./scripts/build.sh > build_log.txt 2>&1
+
+      - name: Publish build log tail
+        if: always()
+        run: |
+          tail -n 300 build_log.txt || true
+          {
+            echo "### Dimbuntu build log — last 300 lines"
+            echo '```text'
+            tail -n 300 build_log.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Checksums and info
         run: |

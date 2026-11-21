@@ -2,6 +2,7 @@
 # Dimbuntu -- build a Xubuntu-style live ISO out of Ubuntu 24.04 LTS.
 # Pipeline: debootstrap -> chroot (Xfce + casper) -> mksquashfs -> grub-mkrescue (BIOS+UEFI).
 set -euo pipefail
+trap 'printf "BUILD-FAILED: line %s: %s\n" "$LINENO" "$BASH_COMMAND" >&2' ERR
 
 DISTRO="${DISTRO:-noble}"          # base Ubuntu release
 VERSION="${VERSION:-24.04}"        # Dimbuntu version
@@ -18,7 +19,7 @@ log() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 die() { printf '\n\033[1;31mFATAL: %s\033[0m\n' "$*" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || die "Please run as root: sudo ./scripts/build.sh"
-for tool in debootstrap mksquashfs grub-mkrescue; do
+for tool in debootstrap mksquashfs grub-mkrescue xorriso mformat chroot; do
   command -v "$tool" >/dev/null 2>&1 || \
     die "Missing tool: $tool (install: debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools)"
 done
@@ -35,6 +36,7 @@ fi
 MOUNTED=0
 mount_chroot() {
   [ "$MOUNTED" -eq 1 ] && return 0
+  mkdir -p "$CHROOT/dev/pts" "$CHROOT/proc" "$CHROOT/sys" "$CHROOT/run" "$CHROOT/tmp"
   mount --bind /dev "$CHROOT/dev"
   mount --bind /dev/pts "$CHROOT/dev/pts"
   mount -t proc proc "$CHROOT/proc"
@@ -60,6 +62,7 @@ ch() {
 }
 
 # DNS inside the chroot (runners often use systemd-resolved stub)
+rm -f "$CHROOT/etc/resolv.conf"
 if [ -f /run/systemd/resolve/resolv.conf ]; then
   cp /run/systemd/resolve/resolv.conf "$CHROOT/etc/resolv.conf"
 else

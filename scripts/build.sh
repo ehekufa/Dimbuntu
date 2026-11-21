@@ -82,34 +82,38 @@ deb $MIRROR ${DISTRO}-updates main restricted universe multiverse
 deb http://security.ubuntu.com/ubuntu ${DISTRO}-security main restricted universe multiverse
 EOF
 
-# ---------------------------------------------------------------- 2. Desktop
-log "Installing Ubuntu base + Xfce desktop (the long part, 10-20 min)"
+# ---------------------------------------------------------------- 2. Packages
+log "apt-get update"
+ch /bin/sh -ec 'apt-get -o Acquire::Retries=3 update'
+
+log "Installing system core + kernel + casper (required for a live ISO)"
 ch /bin/sh -ec '
-  apt-get -o Acquire::Retries=3 update
   apt-get -o Acquire::Retries=3 install -y \
     systemd systemd-sysv dbus sudo locales console-setup \
-    linux-image-generic linux-firmware casper \
-    xubuntu-core \
-    xfce4-terminal mousepad xfce4-whiskermenu-plugin xfce4-xkb-plugin \
-    lightdm lightdm-gtk-greeter \
-    network-manager network-manager-gnome \
-    gvfs-backends xdg-user-dirs \
-    fonts-dejavu fonts-liberation \
-    epiphany-browser \
-    pavu-control \
-    curl wget nano htop less file
-' || ch /bin/sh -ec '
-  echo "xubuntu-core not available, falling back to plain Xfce"
-  apt-get -o Acquire::Retries=3 update
-  apt-get install -y xfce4 xubuntu-default-settings thunar \
-    xfce4-terminal mousepad xfce4-whiskermenu-plugin \
-    lightdm lightdm-gtk-greeter
-'
+    linux-image-generic linux-firmware casper
+' || die "Kernel/casper install failed -- cannot build a live ISO"
+
+log "Installing Xfce desktop (the long part, 10-20 min)"
+if ! ch /bin/sh -ec 'apt-get -o Acquire::Retries=3 install -y xubuntu-core'; then
+  log "xubuntu-core failed -- falling back to plain xfce4"
+  ch /bin/sh -ec 'apt-get -o Acquire::Retries=3 install -y xfce4 xubuntu-default-settings thunar' \
+    || die "Could not install any Xfce desktop"
+fi
+
+log "Installing desktop apps (missing ones are skipped, not fatal)"
+APPS="xfce4-terminal mousepad xfce4-whiskermenu-plugin xfce4-xkb-plugin lightdm lightdm-gtk-greeter network-manager network-manager-gnome gvfs-backends xdg-user-dirs fonts-dejavu fonts-liberation epiphany-browser pavucontrol curl wget nano htop less file"
+if ! ch /bin/sh -ec "apt-get -o Acquire::Retries=3 install -y $APPS"; then
+  log "Group install failed -- retrying packages one by one"
+  for pkg in $APPS; do
+    ch /bin/sh -ec "apt-get -o Acquire::Retries=3 install -y $pkg" || echo "SKIP: $pkg is not available"
+  done
+fi
 
 log "Best-effort extras: Russian language pack"
 ch /bin/sh -ec 'apt-get install -y language-pack-ru' || true
 
 log "Regenerating initramfs with casper hooks"
+ch /bin/sh -ec 'command -v update-initramfs >/dev/null || { echo "update-initramfs is missing, kernel/casper install failed"; exit 1; }'
 ch update-initramfs -u
 
 # ---------------------------------------------------------------- 3. Configuration

@@ -228,7 +228,7 @@ EOF
 log "Packing squashfs (zstd, a few minutes)"
 rm -f "$STAGING/casper/filesystem.squashfs"
 mksquashfs "$CHROOT" "$STAGING/casper/filesystem.squashfs" \
-  -noappend -no-recovery -comp zstd -b 1M -Xcompression-level 19 -processors 0 \
+  -noappend -no-recovery -comp zstd -b 1M -Xcompression-level 19 \
   -e boot dev proc sys run tmp mnt media lost+found
 
 # ---------------------------------------------------------------- 8. ISO

@@ -58,6 +58,8 @@ log "CorePlus-$TC_V downloaded: $(du -h "$ISO_FILE" | cut -f1)"
 # ---------------------------------------------------------------- 2. Extract
 log "Extracting ISO tree"
 bsdtar -x -f "$ISO_FILE" -C "$STAGING"
+# files come out of ISO9660 read-only; make them writable for sed/cat
+chmod -R u+w "$STAGING"
 
 ISOCFG="$(find "$STAGING" -name isolinux.cfg -type f | head -n 1)"
 [ -n "$ISOCFG" ] || die "isolinux.cfg not found in extracted ISO"

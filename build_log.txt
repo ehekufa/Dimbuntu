@@ -1,385 +1,0 @@
-+ set -euo pipefail
-+ trap 'printf "BUILD-FAILED: line %s: %s\n" "$LINENO" "$BASH_COMMAND" >&2' ERR
-+ TC_VERSIONS='16.1 16.0 15.1 15.0'
-+ ISO_NAME=dimbuntu-tiny
-+ HOSTNAME_T=dimbuntu
-+++ dirname ./scripts/build.sh
-++ cd ./scripts/..
-++ pwd
-+ ROOT_DIR=/home/runner/work/Dimbuntu/Dimbuntu
-+ BUILD_DIR=/home/runner/work/Dimbuntu/Dimbuntu/build
-+ STAGING=/home/runner/work/Dimbuntu/Dimbuntu/build/iso-src
-+ ISO_OUT=/home/runner/work/Dimbuntu/Dimbuntu/build/dimbuntu-tiny.iso
-+ MIRRORS=(http://tinycorelinux.net http://repo.tinycorelinux.net http://distro.ibiblio.org/tinycorelinux)
-+ for tool in curl bsdtar xorriso sha256sum md5sum
-+ command -v curl
-+ for tool in curl bsdtar xorriso sha256sum md5sum
-+ command -v bsdtar
-+ for tool in curl bsdtar xorriso sha256sum md5sum
-+ command -v xorriso
-+ for tool in curl bsdtar xorriso sha256sum md5sum
-+ command -v sha256sum
-+ for tool in curl bsdtar xorriso sha256sum md5sum
-+ command -v md5sum
-+ rm -rf /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src
-+ mkdir -p /home/runner/work/Dimbuntu/Dimbuntu/build /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src
-+ log 'Downloading CorePlus (Tiny Core Linux base)'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Downloading CorePlus (Tiny Core Linux base)'
-
-[1;36m==> Downloading CorePlus (Tiny Core Linux base)[0m
-+ TC_V=
-+ download_coreplus
-+ for V in $TC_VERSIONS
-+ major=16
-+ for M in "${MIRRORS[@]}"
-+ base=http://tinycorelinux.net/16.x/x86/release
-+ log 'Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso'
-
-[1;36m==> Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso http://tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://repo.tinycorelinux.net/16.x/x86/release
-+ log 'Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso'
-
-[1;36m==> Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://distro.ibiblio.org/tinycorelinux/16.x/x86/release
-+ log 'Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.1.iso'
-
-[1;36m==> Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   341    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.1.iso.md5.txt
-+ for V in $TC_VERSIONS
-+ major=16
-+ for M in "${MIRRORS[@]}"
-+ base=http://tinycorelinux.net/16.x/x86/release
-+ log 'Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso'
-
-[1;36m==> Trying http://tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso http://tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://tinycorelinux.net/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://repo.tinycorelinux.net/16.x/x86/release
-+ log 'Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso'
-
-[1;36m==> Trying http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso http://repo.tinycorelinux.net/16.x/x86/release/CorePlus-16.0.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://repo.tinycorelinux.net/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://distro.ibiblio.org/tinycorelinux/16.x/x86/release
-+ log 'Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.0.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.0.iso'
-
-[1;36m==> Trying http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.0.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso http://distro.ibiblio.org/tinycorelinux/16.x/x86/release/CorePlus-16.0.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   341    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://distro.ibiblio.org/tinycorelinux/16.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-16.0.iso.md5.txt
-+ for V in $TC_VERSIONS
-+ major=15
-+ for M in "${MIRRORS[@]}"
-+ base=http://tinycorelinux.net/15.x/x86/release
-+ log 'Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso'
-
-[1;36m==> Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso http://tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://tinycorelinux.net/15.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://tinycorelinux.net/15.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://tinycorelinux.net/15.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://repo.tinycorelinux.net/15.x/x86/release
-+ log 'Trying http://repo.tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://repo.tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso'
-
-[1;36m==> Trying http://repo.tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso http://repo.tinycorelinux.net/15.x/x86/release/CorePlus-15.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   169    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://repo.tinycorelinux.net/15.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://repo.tinycorelinux.net/15.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://repo.tinycorelinux.net/15.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso.md5.txt
-+ for M in "${MIRRORS[@]}"
-+ base=http://distro.ibiblio.org/tinycorelinux/15.x/x86/release
-+ log 'Trying http://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.1.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.1.iso'
-
-[1;36m==> Trying http://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.1.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso http://distro.ibiblio.org/tinycorelinux/15.x/x86/release/CorePlus-15.1.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0   341    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
-curl: (22) The requested URL returned error: 404
-+ log 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/15.x/x86/release -- trying next mirror'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Download/verify failed for http://distro.ibiblio.org/tinycorelinux/15.x/x86/release -- trying next mirror'
-
-[1;36m==> Download/verify failed for http://distro.ibiblio.org/tinycorelinux/15.x/x86/release -- trying next mirror[0m
-+ rm -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.1.iso.md5.txt
-+ for V in $TC_VERSIONS
-+ major=15
-+ for M in "${MIRRORS[@]}"
-+ base=http://tinycorelinux.net/15.x/x86/release
-+ log 'Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso'
-
-[1;36m==> Trying http://tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso[0m
-+ curl -fSL --retry 2 --connect-timeout 15 --max-time 900 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.0.iso http://tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0  0  249M    0 65160    0     0  72472      0  1:00:02 --:--:--  1:00:02 72400  0  249M    0  292k    0     0   148k      0  0:28:37  0:00:01  0:28:36  148k  0  249M    0  598k    0     0   208k      0  0:20:21  0:00:02  0:20:19  208k  0  249M    0 1189k    0     0   301k      0  0:14:04  0:00:03  0:14:01  301k  0  249M    0 1841k    0     0   380k      0  0:11:09  0:00:04  0:11:05  380k  1  249M    1 3184k    0     0   539k      0  0:07:52  0:00:05  0:07:47  623k  2  249M    2 5229k    0     0   749k      0  0:05:40  0:00:06  0:05:34  986k  3  249M    3 7726k    0     0   981k      0  0:04:19  0:00:07  0:04:12 1423k  4  249M    4 11.6M    0     0  1351k      0  0:03:08  0:00:08  0:03:00 2195k  7  249M    7 17.6M    0     0  1833k      0  0:02:19  0:00:09  0:02:10 3235k 14  249M   14 35.2M    0     0  3331k      0  0:01:16  0:00:10  0:01:06 6670k 21  249M   21 53.1M    0     0  4576k      0  0:00:55  0:00:11  0:00:44 9998k 28  249M   28 71.6M    0     0  5708k      0  0:00:44  0:00:12  0:00:32 12.8M 36  249M   36 90.8M    0     0  6718k      0  0:00:37  0:00:13  0:00:24 15.7M 44  249M   44  110M    0     0  7624k      0  0:00:33  0:00:14  0:00:19 18.6M 52  249M   52  131M    0     0  8506k      0  0:00:29  0:00:15  0:00:14 19.3M 60  249M   60  151M    0     0  9243k      0  0:00:27  0:00:16  0:00:11 20.0M 68  249M   68  169M    0     0  9763k      0  0:00:26  0:00:17  0:00:09 19.7M 76  249M   76  190M    0     0  10.1M      0  0:00:24  0:00:18  0:00:06 20.0M 85  249M   85  211M    0     0  10.6M      0  0:00:23  0:00:19  0:00:04 19.7M 92  249M   92  231M    0     0  11.0M      0  0:00:22  0:00:20  0:00:02 19.4M100  249M  100  249M    0     0  11.4M      0  0:00:21  0:00:21 --:--:-- 19.6M
-+ curl -fsSL --retry 2 --connect-timeout 15 --max-time 60 -o /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.0.iso.md5.txt http://tinycorelinux.net/15.x/x86/release/CorePlus-15.0.iso.md5.txt
-+ cd /home/runner/work/Dimbuntu/Dimbuntu/build
-+ md5sum -c CorePlus-15.0.iso.md5.txt
-CorePlus-15.0.iso: OK
-+ TC_V=15.0
-+ return 0
-+ ISO_FILE=/home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.0.iso
-++ du -h /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.0.iso
-++ cut -f1
-+ log 'CorePlus-15.0 downloaded: 249M'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'CorePlus-15.0 downloaded: 249M'
-
-[1;36m==> CorePlus-15.0 downloaded: 249M[0m
-+ log 'Extracting ISO tree'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Extracting ISO tree'
-
-[1;36m==> Extracting ISO tree[0m
-+ bsdtar -x -f /home/runner/work/Dimbuntu/Dimbuntu/build/CorePlus-15.0.iso -C /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src
-++ find /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src -name isolinux.cfg -type f
-++ head -n 1
-+ ISOCFG=/home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.cfg
-+ '[' -n /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.cfg ']'
-++ dirname boot/isolinux/isolinux.cfg
-+ ISODIR_REL=boot/isolinux
-+ '[' -f /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.bin ']'
-+ log 'Original isolinux.cfg:'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Original isolinux.cfg:'
-
-[1;36m==> Original isolinux.cfg:[0m
-+ cat /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.cfg
-DEFAULT plus
-UI menu.c32
-PROMPT 0
-TIMEOUT 600
-ONTIMEOUT plus
-F1 f1
-F2 f2
-F3 f3
-F4 f4
-
-MENU TITLE Core plus networking, installation, and remastering.
-MENU MARGIN 6
-MENU VSHIFT 1
-MENU ROWS 13
-MENU TABMSGROW 19
-MENU TABMSG Press ENTER to boot, TAB to edit, or press F1 for more information.
-MENU AUTOBOOT BIOS default device boot in # second{,s}...
-MENU HELPMSGROW 21
-
-LABEL plus
-MENU DEFAULT
-MENU LABEL Boot Core Plus with default FLWM topside.
-TEXT HELP
-Boot Core plus support extensions of networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND  loglevel=3 cde showapps desktop=flwm_topside
-
-LABEL jwm
-MENU LABEL Boot Core Plus with Joe's Window Manager.
-TEXT HELP
-Boot Core with JWM plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=jwm
-
-LABEL icewm
-MENU LABEL Boot Core Plus with ICE Window Manager.
-TEXT HELP
-Boot Core with ICE window manager plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=icewm
-
-LABEL fluxbox
-MENU LABEL Boot Core Plus with Fluxbox Window Manager.
-TEXT HELP
-Boot Core with Fluxbox plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=fluxbox
-
-LABEL hackedbox
-MENU LABEL Boot Core Plus with Hackedbox Window Manager.
-TEXT HELP
-Boot Core with hackedbox plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=hackedbox
-
-LABEL openbox
-MENU LABEL Boot Core Plus with Openbox Window Manager.
-TEXT HELP
-Boot Core with openbox plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=openbox
-
-LABEL flwm
-MENU LABEL Boot Core Plus with FLWM Classic Window Manager.
-TEXT HELP
-Boot Core with flwm plus networking, installation and remastering.
-All extensions are loaded mount mode. Boot media is not removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps desktop=flwm
-
-LABEL tiny
-MENU LABEL Boot Core with only X/GUI (TinyCore).
-TEXT HELP
-Boot Core with flwm_topside. Both user and support extensions are not loaded.
-All X/GUI extensions are loaded mount mode. Boot media is not removable.
-Use TAB to edit desktop= to boot to alternate window manager.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps lst=xbase.lst desktop=flwm_topside
-
-LABEL cxi
-MENU LABEL Boot Core with X/GUI (TinyCore) + Installation Extension.
-TEXT HELP
-Boot Core with flwm_topside, X/GUI, and the installation extension.
-Extensions are loaded mount mode. Boot media is not removable.
-Use TAB to edit desktop= to boot to alternate window manager.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps lst=xibase.lst desktop=flwm_topside
-
-LABEL cxw
-MENU LABEL Boot Core with X/GUI (TinyCore) + Wifi Extension.
-TEXT HELP
-Boot Core with flwm_topside with X/GUI and the Wifi Extension.
-Extensions are loaded mount mode. Boot media is not removable.
-Use TAB to edit desktop= to boot to alternate window manager.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps lst=xwbase.lst desktop=flwm_topside
-
-LABEL cxf
-MENU LABEL Boot Core with X/GUI (TinyCore) + Wifi + Firmware.
-TEXT HELP
-Boot Core with flwm_topside with X/GUI, Wifi, and firmware extensions.
-Extensions are loaded mount mode. Boot media is not removable.
-Use TAB to edit desktop= to boot to alternate window manager.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 cde showapps lst=xfbase.lst desktop=flwm_topside
-
-LABEL core
-MENU LABEL Boot Core to command line only. No X/GUI or extensions.
-TEXT HELP
-Boot Core character text mode to ram. No user or support extensions are loaded.
-Boot media is removable.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 base
-
-LABEL nocde
-MENU LABEL Boot Core without embedded extensions with waitusb=5.
-TEXT HELP
-Boot Core to base system. No embedded support extensions are loaded. User extensions
-scanned or specified will be loaded and will need to provide X/GUI if required.
-ENDTEXT
-KERNEL /boot/vmlinuz
-INITRD /boot/core.gz
-APPEND loglevel=3 waitusb=5 base
-+ log 'Customizing boot menu (Dimbuntu branding + Russian keyboard entry)'
-+ printf '\n\033[1;36m==> %s\033[0m\n' 'Customizing boot menu (Dimbuntu branding + Russian keyboard entry)'
-
-[1;36m==> Customizing boot menu (Dimbuntu branding + Russian keyboard entry)[0m
-+ cp /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.cfg /home/runner/work/Dimbuntu/Dimbuntu/build/isolinux.cfg.original
-+ sed -i -e s/TINYCORE/DIMBUNTU/g -e s/TinyCore/Dimbuntu/g -e s/COREPLUS/DIMBUNTU/g -e s/CorePlus/Dimbuntu/g /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/isolinux.cfg
-sed: couldn't open temporary file /home/runner/work/Dimbuntu/Dimbuntu/build/iso-src/boot/isolinux/sediWCzO9: Permission denied
-++ printf 'BUILD-FAILED: line %s: %s\n' 73 'sed -i -e '\''s/TINYCORE/DIMBUNTU/g'\'' -e '\''s/TinyCore/Dimbuntu/g'\'' -e '\''s/COREPLUS/DIMBUNTU/g'\'' -e '\''s/CorePlus/Dimbuntu/g'\'' "$ISOCFG"'
-BUILD-FAILED: line 73: sed -i -e 's/TINYCORE/DIMBUNTU/g' -e 's/TinyCore/Dimbuntu/g' -e 's/COREPLUS/DIMBUNTU/g' -e 's/CorePlus/Dimbuntu/g' "$ISOCFG"

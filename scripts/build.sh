@@ -53,6 +53,9 @@ umount_chroot() {
 trap umount_chroot EXIT
 mount_chroot
 
+# dirs mksquashfs excludes must exist
+mkdir -p "$CHROOT/mnt" "$CHROOT/media" "$CHROOT/lost+found" 2>/dev/null || true
+
 ch() {
   chroot "$CHROOT" /usr/bin/env -i \
     HOME=/root TERM="${TERM:-dumb}" \
@@ -178,11 +181,20 @@ trap - EXIT
 
 # ---------------------------------------------------------------- 5. Kernel + initrd
 log "Extracting kernel and initrd"
-VMLINUZ="$(ls -1 "$CHROOT"/boot/vmlinuz-* 2>/dev/null | head -n 1)"
+VMLINUZ="$(ls -1 "$CHROOT"/boot/vmlinuz-* 2>/dev/null | head -n 1 || true)"
 [ -n "$VMLINUZ" ] || die "No kernel found in chroot /boot"
-[ -e "$CHROOT/initrd.img" ] || die "No initrd.img in chroot"
+INITRD_SRC="$(ls -1 "$CHROOT"/boot/initrd.img-* 2>/dev/null | head -n 1 || true)"
+if [ -z "$INITRD_SRC" ] && [ -e "$CHROOT/initrd.img" ]; then
+  INITRD_SRC="$CHROOT/initrd.img"
+fi
+if [ -z "$INITRD_SRC" ]; then
+  log "initrd not found, generating explicitly"
+  ch update-initramfs -c -k all || true
+  INITRD_SRC="$(ls -1 "$CHROOT"/boot/initrd.img-* 2>/dev/null | head -n 1 || true)"
+fi
+[ -n "$INITRD_SRC" ] || die "No initrd found in chroot /boot"
 cp "$VMLINUZ" "$STAGING/casper/vmlinuz"
-cp -L "$CHROOT/initrd.img" "$STAGING/casper/initrd"
+cp -L "$INITRD_SRC" "$STAGING/casper/initrd"
 
 # ---------------------------------------------------------------- 6. GRUB menu
 log "Writing GRUB menu"

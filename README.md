@@ -1,65 +1,51 @@
-# Dimbuntu
+# Dimbuntu Tiny
 
-**Dimbuntu** — это маленький «свой» дистрибутив на базе **Ubuntu 24.04 LTS** с рабочим столом **Xfce** (в духе Xubuntu). Собирается с нуля из deb-пакетов Ubuntu и упаковывается в загрузочный live-ISO (BIOS + UEFI).
+**Dimbuntu Tiny** — крошечный «свой» live-дистрибутив на базе **Tiny Core Linux (CorePlus)**. Итоговый ISO весит **~110 МБ** — в ~14 раз меньше прежней Ubuntu-сборки, грузится за секунды.
 
 ![Build](https://github.com/ehekufa/Dimbuntu/actions/workflows/build-iso.yml/badge.svg)
 
-## Что внутри
+## Что это такое
 
-- Ubuntu 24.04 LTS (noble), ядро `linux-image-generic`
-- Рабочий стол Xfce из метапакета `xubuntu-core` (как у Xubuntu)
-- LightDM + lightdm-gtk-greeter, браузер Epiphany, Thunar, xfce4-terminal
-- Сеть через NetworkManager, индикатор раскладки `xfce4-xkb-plugin`
-- **Русская локаль и раскладка по умолчанию** (us/ru, переключение Alt+Shift)
-- Live-режим через `casper`: загрузка без установки, пользователь `dimbuntu`
-- Без snapd — быстрая загрузка
+Скрипт берёт официальный CorePlus ISO, распаковывает его и пересобирает со своими настройками:
 
-## Как собрать через GitHub Actions (основной способ)
+- пункт меню **«Dimbuntu Tiny (Russian keyboard)»** по умолчанию — русская консольная раскладка (`kmap=ru`) и имя хоста `dimbuntu`
+- фирменные названия в меню загрузки, метка тома `DIMBUNTU_TINY`
+- гибридный ISO с isohybrid-MBR — можно писать на флешку через `dd`
 
-1. Открой вкладку **Actions** в репозитории → workflow **Build Dimbuntu ISO**.
-2. Сборка запускается автоматически на каждый push, либо нажми **Run workflow**.
-3. Когда програнение завершится — в нём появится артефакт **dimbuntu-24.04-amd64** (zip с ISO и SHA256SUMS). Скачай его.
-4. При пуше тега `v*` (например `v24.04`) ISO автоматически прикладывается к GitHub Release.
+Внутри CorePlus: графическое окружение FLTK (flwm + wbar), набор утилит, установщик на диск, поддержка Wi-Fi и не-англоязычных раскладок.
 
-## Как собрать локально
+## Скачивание
 
-Нужен Ubuntu/Debian и пакеты:
+GitHub → **Actions** → зелёный прогон **Build Dimbuntu Tiny ISO** → **Download artifacts** → `dimbuntu-tiny-x86` (внутри ISO + SHA256SUMS). Артефакт хранится 30 дней. На тегах `v*` ISO автоматически прикладывается к Releases.
+
+## Запуск
+
+- **Виртуалка:** VirtualBox/VMware или `qemu-system-i386 -m 512 -cdrom dimbuntu-tiny.iso` — хватает 512 МБ RAM
+- **Флешка:** `sudo dd if=dimbuntu-tiny.iso of=/dev/sdX bs=4M status=progress oflag=sync`
+- ⚠️ Образ (как и оригинальный CorePlus) грузится в режиме **BIOS/Legacy** — на чистых UEFI-машинах включите CSM или используйте виртуалку. 64-битный вариант с UEFI (CorePure64) — в планах.
+
+## Локальная сборка
 
 ```bash
-sudo apt install debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin mtools
-sudo ./scripts/build.sh
+sudo apt install xorriso libarchive-tools syslinux-common curl
+./scripts/build.sh
 ```
 
-Готовый ISO появится в `build/dimbuntu-24.04-amd64.iso`.
+Скрипт скачивает CorePlus с официальных зеркал (пробует версии 16.x → 15.x, проверяет md5), правит меню и пересобирает ISO в `build/dimbuntu-tiny.iso`.
 
-Переменные окружения: `DISTRO` (базовый релиз Ubuntu, по умолчанию `noble`), `VERSION` (версия Dimbuntu, по умолчанию `24.04`).
+Переменные окружения: `TC_VERSIONS` (кандидаты версий Tiny Core), `ISO_NAME` (имя результата), `HOSTNAME_T` (hostname live-системы).
 
-## Как записать на флешку
+## Переименование репозитория
 
-- **Windows:** Rufus, balenaEtcher или Ventoy.
-- **Linux:**
-  ```bash
-  sudo dd if=build/dimbuntu-24.04-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync
-  ```
+Workflow не содержит зашитого имени репозитория (использует встроенные переменные GitHub), поэтому переименование ничего не ломает. Бейдж в README после переименования продолжит работать через автоматический редирект GitHub — при желании обновите ссылку.
 
-> ⚠️ **Secure Boot нужно отключить** в UEFI/BIOS — GRUB в образе не подписан. Обычная загрузка (UEFI или Legacy) работает.
+## История
 
-## Первый запуск
-
-- В меню GRUB выбери **Dimbuntu 24.04 (live)**.
-- Вариант **whole image in RAM** целиком копирует систему в память (нужно 4+ ГБ RAM) — работает быстрее и позволяет вынуть флешку.
-- Интернет: подключись через значок сети в трее. Ставить пакеты можно прямо в live-режиме: `sudo apt update && sudo apt install <пакет>`.
-
-## Структура
-
-```
-scripts/build.sh              # вся сборка: debootstrap -> chroot -> squashfs -> grub-mkrescue
-.github/workflows/build-iso.yml  # CI: сборка ISO на каждый push + артефакт/Release
-build/                        # временные файлы сборки (в git не попадают)
-```
+Первая версия Dimbuntu собиралась на базе **Ubuntu 24.04 + Xfce** (ISO ~1.5 ГБ, успешный прогон CI есть в истории Actions) — она осталась в истории git (коммиты до `641af43`), если захочешь вернуться.
 
 ## Идеи на будущее
 
-- Установщик на диск (Calamares) и persist-режим для флешки
-- Своя тема/обои/брендинг
-- Сборка под ARM64
+- Вшить свои расширения (.tcz) прямо в initrd
+- Своя тема wbar, обои, брендинг
+- CorePure64 (x86_64 + UEFI) вариант
+- Persist-режим для флешки (tce/copy2fs)
